@@ -3,9 +3,11 @@
         "outDir": "./lib",
         "module": "CommonJS",
         "target": "ES5",
-        "lib": ["ES2015", "DOM"],
+        "lib": ["ES2015"],
         "declaration": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "skipLibCheck": true,
+        "typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
     },
     "include": ["./src/**/*"]
 }
