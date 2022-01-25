@@ -8,12 +8,6 @@ export * from "./systems/modules";
 
 // Create the lazy-initializing scene.
 export const scene = new Lazy<Scene>(() => {
-    // The library requires the use of the DOM, hence it cannot run in non-browser environments.
-    if (typeof document === "undefined" || typeof window === "undefined") {
-        throw new Error(
-            "It seems like you are trying to run party.js in a non-browser-like environment, which is not supported."
-        );
-    }
     return new Scene();
 });
 

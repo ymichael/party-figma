@@ -38,8 +38,8 @@ export class Debug {
         // If the current display style does not match the style inferred from the
         // enabled-state, update it.
         const displayStyle = settings.debug ? "block" : "none";
-        if (container.style.display !== displayStyle) {
-            container.style.display = displayStyle;
+        if (container.displayStyle !== displayStyle) {
+            container.displayStyle = displayStyle;
         }
 
         if (!settings.debug) {
@@ -51,7 +51,7 @@ export class Debug {
         if (this.refreshTimer > 1 / this.refreshRate) {
             this.refreshTimer = 0;
             // Update the container with the fetched information joined on line breaks.
-            container.innerHTML = this.getDebugInformation(delta).join("<br>");
+            // container.innerHTML = this.getDebugInformation(delta).join("<br>");
         }
     }
 

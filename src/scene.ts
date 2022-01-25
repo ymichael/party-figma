@@ -29,14 +29,14 @@ export class Scene {
     /**
      * The ID of the currently scheduled tick.
      */
-    private scheduledTickId?: number = undefined;
+    private scheduledTickId?: any = undefined;
     /**
      * The timestamp of the last tick, used to calculate deltas.
      *
      * @initialValue `performance.now()` (time origin)
      * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp
      */
-    private lastTickTimestamp = performance.now();
+    private lastTickTimestamp = Date.now();
 
     /**
      * Initializes a new scene and starts the ticking job.
@@ -80,13 +80,15 @@ export class Scene {
      * Schedules a tick in the scene.
      */
     public scheduleTick(): void {
-        this.scheduledTickId = window.requestAnimationFrame(this.tick);
+        this.scheduledTickId = setTimeout(() => {
+            this.tick(Date.now());
+        }, 10);
     }
     /**
      * Cancels a pending tick operation.
      */
     public cancelTick(): void {
-        window.cancelAnimationFrame(this.scheduledTickId);
+        clearTimeout(this.scheduledTickId);
     }
 
     /**

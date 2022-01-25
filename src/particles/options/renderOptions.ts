@@ -1,13 +1,15 @@
 import { Color } from "../../components";
+import { RenderedElement } from "../../containers";
+import { TShape } from "../../systems/shapes";
 import { Variation } from "../../systems/variation";
 import { Particle } from "../particle";
 
 /**
  * Represents a delegate used by the renderer to apply a certain property to the
- * particle's HTMLElement. Note that this property is generic and does not
+ * particle's RenderedElement. Note that this property is generic and does not
  * have to contain the particle itself.
  */
-export type ApplyFunction<T> = (property: T, element: HTMLElement) => void;
+export type ApplyFunction<T> = (property: T, element: RenderedElement) => void;
 
 /**
  * Holds the options used to configure the renderer for a particle system.
@@ -21,31 +23,27 @@ export interface RenderOptions {
      * Depending on the type of value that is returned from the factory, additional
      * processing has to be done.
      *
-     * - strings: The `party.resolvableShapes` lookup is used to resolve the string to an actual
-     * HTMLElement, before following the same procedure as if an HTMLElement would have been passed.
-     * - HTMLElements: The returned element is deep cloned and used to represent the particle in the document.
-     *
      * @defaultValue Creates a square-shaped `<div>` element with a size of 10px.
      */
-    shapeFactory: Variation<HTMLElement | string>;
+    shapeFactory: Variation<RenderedElement | TShape>;
 
     /**
-     * The delegate used to apply a certain color to the particle's HTMLElement.
+     * The delegate used to apply a certain color to the particle's RenderedElement.
      * @defaultValue Applies the specified color to the element's "background" property.
      */
     applyColor?: ApplyFunction<Color>;
     /**
-     * The delegate used to apply a certain degree of opacity to the particle's HTMLElement.
+     * The delegate used to apply a certain degree of opacity to the particle's RenderedElement.
      * @defaultValue Applies the specified opacity to the element's "opacity" property.
      */
     applyOpacity?: ApplyFunction<number>;
     /**
-     * The delegate used to apply a certain degree of lighting to the particle's HTMLElement.
+     * The delegate used to apply a certain degree of lighting to the particle's RenderedElement.
      * @defaultValue Applies the specified lighting to the element as a brightness filter.
      */
     applyLighting?: ApplyFunction<number>;
     /**
-     * The delegate used to apply a certain transform to the particle's HTMLElement.
+     * The delegate used to apply a certain transform to the particle's RenderedElement.
      * @defaultValue Applies the specified transform to the element as a 3D CSS transform.
      */
     applyTransform?: ApplyFunction<Particle>;
@@ -69,31 +67,15 @@ export function getDefaultRendererOptions(): RenderOptions {
  * Applies the specified color to the element.
  *
  * @remarks
- * This function is aware of the element's node type:
- * - `div` elements have their `background` set.
- * - `svg` elements have their `fill` and `color` set.
- * - Other elements have their `color` set.
  */
-function defaultApplyColor(color: Color, element: HTMLElement): void {
-    const hex = color.toHex();
-    // Note that by default, HTML node names are uppercase.
-    switch (element.nodeName.toLowerCase()) {
-        case "div":
-            element.style.background = hex;
-            break;
-        case "svg":
-            element.style.fill = element.style.color = hex;
-            break;
-        default:
-            element.style.color = hex;
-            break;
-    }
+function defaultApplyColor(color: Color, element: RenderedElement): void {
+    element.applyColor(color);
 }
 /**
  * Applies the specified opacity to the element.
  */
-function defaultApplyOpacity(opacity: number, element: HTMLElement): void {
-    element.style.opacity = opacity.toString();
+function defaultApplyOpacity(opacity: number, element: RenderedElement): void {
+    element.applyOpacity(opacity);
 }
 /**
  * Applies the specified lighting to the element as a brightness filter.
@@ -103,22 +85,20 @@ function defaultApplyOpacity(opacity: number, element: HTMLElement): void {
  * particle should be lit from both sides. The brightness filter can exceed 1,
  * to give the particles a "glossy" feel.
  */
-function defaultApplyLighting(lighting: number, element: HTMLElement): void {
-    element.style.filter = `brightness(${0.5 + Math.abs(lighting)})`;
+function defaultApplyLighting(
+    lighting: number,
+    element: RenderedElement
+): void {
+    element.applyBrightness(0.5 + Math.abs(lighting));
 }
 /**
  * Applies the specified transform to the element as a 3D CSS transform.
  * Also takes into account the current window scroll, to make sure that particles are
  * rendered inside of the fixed container.
  */
-function defaultApplyTransform(particle: Particle, element: HTMLElement): void {
-    element.style.transform =
-        // Make sure to take window scrolling into account.
-        `translateX(${(particle.location.x - window.scrollX).toFixed(3)}px) ` +
-        `translateY(${(particle.location.y - window.scrollY).toFixed(3)}px) ` +
-        `translateZ(${particle.location.z.toFixed(3)}px) ` +
-        `rotateX(${particle.rotation.x.toFixed(3)}deg) ` +
-        `rotateY(${particle.rotation.y.toFixed(3)}deg) ` +
-        `rotateZ(${particle.rotation.z.toFixed(3)}deg) ` +
-        `scale(${particle.size.toFixed(3)})`;
+function defaultApplyTransform(
+    particle: Particle,
+    element: RenderedElement
+): void {
+    element.applyTransform(particle.location, particle.rotation, particle.size);
 }

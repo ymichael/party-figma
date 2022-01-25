@@ -1,3 +1,5 @@
+import { RenderedElement } from "../containers";
+
 /**
  * Represents a rectangle with an origin and size.
  */
@@ -33,23 +35,18 @@ export class Rect {
      */
     public static fromScreen(): Rect {
         return new Rect(
-            window.scrollX,
-            window.scrollY,
-            window.innerWidth,
-            window.innerHeight
+            figma.viewport.bounds.x,
+            figma.viewport.bounds.y,
+            figma.viewport.bounds.width,
+            figma.viewport.bounds.height
         );
     }
 
     /**
      * Returns a new document-space rectangle from the specified element.
      */
-    public static fromElement(element: HTMLElement): Rect {
+    public static fromElement(element: RenderedElement): Rect {
         const r = element.getBoundingClientRect();
-        return new Rect(
-            window.scrollX + r.x,
-            window.scrollY + r.y,
-            r.width,
-            r.height
-        );
+        return new Rect(r.x, r.y, r.width, r.height);
     }
 }

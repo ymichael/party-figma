@@ -1,23 +1,22 @@
 import { settings } from "..";
 import { Vector } from "../components/vector";
-import { particleContainer } from "../containers";
-import { resolveShapeFactory } from "../systems/shapes";
+import { particleContainer, RenderedElement } from "../containers";
+import { resolveShapeFactory, TShape } from "../systems/shapes";
 import { rotationToNormal } from "../util";
 import { Emitter } from "./emitter";
 import { RenderOptions } from "./options";
 import { Particle } from "./particle";
 
 /**
- * Represents a renderer used to draw particles to the DOM via HTML
- * elements. Additionally, it is responsible for purging the elements
+ * Represents a renderer used to draw particles. Additionally, it is responsible for purging the elements
  * of destroyed particles from the DOM.
  */
 export class Renderer {
     /**
      * The lookup of elements currently handled by the renderer, with the
-     * particle ID as key and a HTMLElement as the value.
+     * particle ID as key and a RenderedElement as the value.
      */
-    public elements: Map<symbol, HTMLElement> = new Map();
+    public elements: Map<symbol, RenderedElement> = new Map();
     /**
      * The normalized direction the light comes from.
      */
@@ -35,11 +34,7 @@ export class Renderer {
     private enabled = true;
 
     public constructor() {
-        // Respect that users might prefer reduced motion.
-        // See: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
-        this.enabled =
-            !settings.respectReducedMotion ||
-            !window.matchMedia("(prefers-reduced-motion)").matches;
+        this.enabled = true;
     }
 
     /**
@@ -51,7 +46,7 @@ export class Renderer {
     }
     /**
      * Terminates an existing render block. This checks which particles were rendered
-     * during the block and purges all unused HTMLElements from the DOM.
+     * during the block and purges all unused RenderedElements from the DOM.
      *
      * @returns The amount of particles that were rendered.
      */
@@ -73,7 +68,7 @@ export class Renderer {
 
     /**
      * Renders an individual particle to the DOM. If the particle is rendered for the first
-     * time, a HTMLElement will be created using the emitter's render settings.
+     * time, a RenderedElement will be created using the emitter's render settings.
      *
      * @param particle The particle to be rendered.
      * @param emitter The system containing the particle.
@@ -119,19 +114,16 @@ export class Renderer {
     }
 
     /**
-     * Creates the HTMLElement for a particle that does not have one already.
+     * Creates the RenderedElement for a particle that does not have one already.
      */
     private createParticleElement(
         particle: Particle,
         options: RenderOptions
-    ): HTMLElement {
+    ): RenderedElement {
         // Resolve the element returned from the factory.
-        const resolved = resolveShapeFactory(options.shapeFactory);
+        const element = resolveShapeFactory(options.shapeFactory);
         // Clone the node to ensure we do not break existing elements.
-        const element = resolved.cloneNode(true) as HTMLElement;
-
-        // Ensure that the elements can be "stacked" ontop of eachother.
-        element.style.position = "absolute";
+        // const element = resolved.cloneElement();
 
         // Register the new element in the map, while appending the new element to the DOM.
         this.elements.set(

@@ -1,8 +1,10 @@
 import { scene } from "../";
 import { Color, Vector } from "../components";
+import { RenderedElement } from "../containers";
 import { Emitter } from "../particles/emitter";
 import { ModuleBuilder, ModuleFunction } from "../systems/modules";
 import * as random from "../systems/random";
+import { TShape } from "../systems/shapes";
 import * as sources from "../systems/sources";
 import * as variation from "../systems/variation";
 import * as util from "../util";
@@ -17,7 +19,7 @@ export interface ConfettiConfiguration {
     size: variation.Variation<number>;
     rotation: variation.Variation<Vector>;
     color: variation.Variation<Color>;
-    shapes: variation.Variation<string | HTMLElement>;
+    shapes: variation.Variation<TShape | RenderedElement>;
     modules: ModuleFunction[];
 }
 
@@ -72,7 +74,7 @@ export function confetti(
                 variation.evaluateVariation(populated.spread)
             ),
 
-            initialLifetime: 8,
+            initialLifetime: 3.5,
             initialSpeed: populated.speed,
             initialSize: populated.size,
             initialRotation: populated.rotation,
@@ -82,6 +84,5 @@ export function confetti(
             shapeFactory: populated.shapes,
         },
     });
-
     return emitter;
 }
