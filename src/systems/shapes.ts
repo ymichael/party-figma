@@ -3,6 +3,12 @@ import { Variation, evaluateVariation } from "./variation";
 
 export type TShape = "square" | "circle" | "star";
 
+function isFigmaNode(node: any): node is FrameNode | StarNode {
+    return (
+        typeof node === "object" && ("" + node.toString()).startsWith("[Node ")
+    );
+}
+
 /**
  * Resolves the specified element factory using the resolvable elements, if needed.
  */
@@ -25,6 +31,9 @@ export function resolveShapeFactory(
         node.resize(initialSize, initialSize);
         node.fills = [{ type: "SOLID", color: { r: 0, b: 0, g: 0 } }];
         return new FigmaRenderedElement(node, initialSize);
+    }
+    if (isFigmaNode(shape)) {
+        return new FigmaRenderedElement(shape, shape.width);
     }
     return shape;
 }
