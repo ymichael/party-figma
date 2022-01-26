@@ -1,5 +1,5 @@
 {
-    "name": "party-js",
+    "name": "party-figma",
     "version": "2.1.2",
     "description": "A JavaScript library to brighten up your user's site experience with visual effects!",
     "main": "./lib/index.js",
