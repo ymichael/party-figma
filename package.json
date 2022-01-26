@@ -6,10 +6,11 @@
     "types": "./lib/index.d.ts",
     "scripts": {
         "clean": "rimraf bundle lib",
-        "build": "yarn clean && tsc && webpack",
+        "build": "npm run clean && tsc && webpack",
         "test": "mocha -r ts-node/register 'tests/**/*.test.ts'",
         "lint": "eslint . --ext .js,.ts",
         "dev": "webpack serve",
+        "prepare": "npm run build",
         "prepublishOnly": "yarn build"
     },
     "repository": {
