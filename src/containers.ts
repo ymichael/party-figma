@@ -22,13 +22,12 @@ export interface RenderedElement {
     applyTransform(location: Vector, rotation: Vector, scale: number): void;
 }
 
+export type TFigmaNode = FrameNode | StarNode;
+
 export class FigmaRenderedElement implements RenderedElement {
     private childIds = new Set<string>();
 
-    constructor(
-        readonly node: FrameNode | StarNode,
-        readonly initialSize: number = 20
-    ) {}
+    constructor(readonly node: TFigmaNode, readonly initialSize: number = 20) {}
 
     get id(): string {
         return this.node.id;

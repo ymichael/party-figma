@@ -1,4 +1,8 @@
-import { RenderedElement, FigmaRenderedElement } from "../containers";
+import {
+    RenderedElement,
+    FigmaRenderedElement,
+    TFigmaNode,
+} from "../containers";
 import { Variation, evaluateVariation } from "./variation";
 
 export type TShape = "square" | "circle" | "star";
@@ -13,7 +17,7 @@ function isFigmaNode(node: any): node is FrameNode | StarNode {
  * Resolves the specified element factory using the resolvable elements, if needed.
  */
 export function resolveShapeFactory(
-    factory: Variation<TShape | RenderedElement>
+    factory: Variation<TShape | TFigmaNode>
 ): RenderedElement {
     // Retrieve the unresolved element from the factory.
     const shape = evaluateVariation(factory);
@@ -35,5 +39,6 @@ export function resolveShapeFactory(
     if (isFigmaNode(shape)) {
         return new FigmaRenderedElement(shape, shape.width);
     }
-    return shape;
+
+    throw new Error(`Got invalid shape ${shape} from factory ${factory}`);
 }

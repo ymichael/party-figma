@@ -1,6 +1,6 @@
 import { scene } from "../";
 import { Color, Vector } from "../components";
-import { RenderedElement } from "../containers";
+import { TFigmaNode } from "../containers";
 import { Emitter } from "../particles/emitter";
 import { ModuleBuilder, ModuleFunction } from "../systems/modules";
 import * as random from "../systems/random";
@@ -19,7 +19,7 @@ export interface ConfettiConfiguration {
     size: variation.Variation<number>;
     rotation: variation.Variation<Vector>;
     color: variation.Variation<Color>;
-    shapes: variation.Variation<TShape | RenderedElement>;
+    shapes: variation.Variation<TShape | TFigmaNode>;
     modules: ModuleFunction[];
 }
 

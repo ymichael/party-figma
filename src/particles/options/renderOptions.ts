@@ -1,5 +1,5 @@
 import { Color } from "../../components";
-import { RenderedElement } from "../../containers";
+import { RenderedElement, TFigmaNode } from "../../containers";
 import { TShape } from "../../systems/shapes";
 import { Variation } from "../../systems/variation";
 import { Particle } from "../particle";
@@ -25,7 +25,7 @@ export interface RenderOptions {
      *
      * @defaultValue Creates a square-shaped `<div>` element with a size of 10px.
      */
-    shapeFactory: Variation<RenderedElement | TShape>;
+    shapeFactory: Variation<TFigmaNode | TShape>;
 
     /**
      * The delegate used to apply a certain color to the particle's RenderedElement.
