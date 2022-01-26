@@ -4,6 +4,8 @@ This is a fork of the awesome [party-js](https://github.com/yiliansource/party-j
 
 Instead of rendering DOM elements, we use the [plugin api](https://www.figma.com/plugin-docs/intro/) to render Figma layers. The rest of the API should be very similar to https://party.js.org/.
 
+![gif](https://user-images.githubusercontent.com/610102/151082222-8b1aa95b-6642-4894-865a-7a60e8f0ceff.gif)
+
 ## Installation
 
 ```sh
