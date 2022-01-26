@@ -1,3 +1,62 @@
+# party-figma
+
+This is a fork of the awesome [party-js](https://github.com/yiliansource/party-js) library to work inside of Figma.
+
+Instead of rendering DOM elements, we use the [plugin api](https://www.figma.com/plugin-docs/intro/) to render Figma layers. The rest of the API should be very similar to https://party.js.org/.
+
+## Installation
+
+```sh
+npm install https://github.com/ymichael/party-figma
+```
+
+## Usage
+
+Create sparkles out of a given node
+
+```ts
+import party from "party-figma"
+
+// You can you any plugin node for this
+const node = figma.getNodeById(nodeId) as FrameNode;
+
+// Sparkles out of `node`
+const emitter = party.sparkles(
+    new party.Rect(node.x, node.y, node.width, node.height),
+    { count: 20 }
+)
+```
+
+Confetti
+
+```ts
+const emitter = party.confetti(
+    new party.Rect(node.x, node.y, node.width, node.height),
+    {
+        count: 30,
+        speed: party.variation.range(600, 700),
+        spread: party.variation.range(10, 20),
+    }
+)
+```
+
+You can even supply a random shape factory and return your own figma layer
+
+```ts
+const emitter = party.confetti(
+    new party.Rect(node.x, node.y, node.width, node.height),
+    {
+        count: party.variation.range(20, 30),
+        shapes: () => {
+          const node = figma.createFrame();
+          return node;
+        },
+    }
+)
+```
+
+---
+
 <h1 align="center">
     <img src="https://raw.githubusercontent.com/yiliansource/party-js/main/.github/banner.svg"/>
 </h1>
