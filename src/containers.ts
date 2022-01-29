@@ -7,6 +7,7 @@ export interface RenderedElement {
     readonly isActive: boolean;
     readonly initialSize: number;
     displayStyle: string;
+    getNode(): any;
     cloneElement(): RenderedElement;
     remove(): void;
     applyColor(color: Color): void;
@@ -22,12 +23,12 @@ export interface RenderedElement {
     applyTransform(location: Vector, rotation: Vector, scale: number): void;
 }
 
-export type TFigmaNode = FrameNode | StarNode;
+export type TFigmaNode = FrameNode | StarNode | PageNode | GroupNode;
 
 export class FigmaRenderedElement implements RenderedElement {
     private childIds = new Set<string>();
 
-    constructor(readonly node: TFigmaNode, readonly initialSize: number = 20) {}
+    constructor(private node: TFigmaNode, readonly initialSize: number = 20) {}
 
     get id(): string {
         return this.node.id;
@@ -37,11 +38,21 @@ export class FigmaRenderedElement implements RenderedElement {
         return true;
     }
 
+    getNode(): TFigmaNode {
+        return this.node;
+    }
+
     get displayStyle(): string {
+        if (this.node.type === "PAGE") {
+            return "block";
+        }
         return this.node.visible ? "block" : "none";
     }
 
     set displayStyle(style: string) {
+        if (this.node.type === "PAGE") {
+            return;
+        }
         this.node.visible = style !== "none";
     }
 
@@ -50,20 +61,34 @@ export class FigmaRenderedElement implements RenderedElement {
     }
 
     remove(): void {
-        for (let childId of Array.from(this.childIds)) {
-            const child = figma.getNodeById(childId);
-            child.remove();
-        }
         this.node.remove();
     }
 
     appendChild(child: FigmaRenderedElement): FigmaRenderedElement {
         this.childIds.add(child.id);
+
+        if (this.node.type === "PAGE") {
+            this.node = figma.group([child.getNode()], this.node);
+        } else if (this.node.type === "GROUP") {
+            this.node = figma.group(
+                [...this.node.children, child.getNode()],
+                this.node.parent
+            );
+        }
+
         return child;
     }
 
     applyColor(color: Color): void {
-        this.node.fills = [
+        if (this.node.type === "PAGE") {
+            console.warn("Attempting to applyColor on PageNode");
+            return;
+        }
+        let targetNode = this.node as any;
+        if (targetNode.children?.[0]) {
+            targetNode = targetNode.children[0];
+        }
+        targetNode.fills = [
             {
                 type: "SOLID",
                 color: {
@@ -76,6 +101,10 @@ export class FigmaRenderedElement implements RenderedElement {
     }
 
     applyOpacity(opacity: number): void {
+        if (this.node.type === "PAGE") {
+            console.warn("Attempting to applyOpacity on PageNode");
+            return;
+        }
         this.node.opacity = opacity;
     }
 
@@ -84,13 +113,20 @@ export class FigmaRenderedElement implements RenderedElement {
     }
 
     applyTransform(location: Vector, rotation: Vector, scale: number): void {
-        if (scale < 0.01) {
-            this.node.visible = false;
+        if (this.node.type === "PAGE") {
+            console.warn("Attempting to applyTransform to PageNode");
             return;
         }
+        if (scale < 0.01) {
+            this.node.visible = false;
+        } else {
+            this.node.visible = true;
+        }
 
-        this.node.visible = true;
         this.node.resize(this.initialSize * scale, this.initialSize * scale);
+        this.node.x = location.x;
+        this.node.y = location.y;
+
         var skewX = Math.tan((rotation.x * Math.PI) / 180);
         var skewY = Math.tan((rotation.y * Math.PI) / 180);
         this.node.relativeTransform = [
@@ -105,6 +141,9 @@ export class FigmaRenderedElement implements RenderedElement {
         width: number;
         height: number;
     } {
+        if (this.node.type === "PAGE") {
+            return figma.viewport.bounds;
+        }
         return this.node.absoluteRenderBounds!;
     }
 }
