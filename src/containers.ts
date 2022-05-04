@@ -131,9 +131,11 @@ export class FigmaRenderedElement implements RenderedElement {
             this.node.visible = false;
         } else {
             this.node.visible = true;
+            this.node.resize(
+                this.initialSize * scale,
+                this.initialSize * scale
+            );
         }
-
-        this.node.resize(this.initialSize * scale, this.initialSize * scale);
         this.node.x = location.x;
         this.node.y = location.y;
 
