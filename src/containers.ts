@@ -42,6 +42,14 @@ export class FigmaRenderedElement implements RenderedElement {
         return this.node;
     }
 
+    getTargetNode(): any {
+        let targetNode = this.node as any;
+        if (targetNode.children?.[0]) {
+            targetNode = targetNode.children[0];
+        }
+        return targetNode;
+    }
+
     get displayStyle(): string {
         if (this.node.type === "PAGE") {
             return "block";
@@ -66,7 +74,6 @@ export class FigmaRenderedElement implements RenderedElement {
 
     appendChild(child: FigmaRenderedElement): FigmaRenderedElement {
         this.childIds.add(child.id);
-
         if (this.node.type === "PAGE") {
             this.node = figma.group([child.getNode()], this.node);
         } else if (this.node.type === "GROUP") {
@@ -75,7 +82,6 @@ export class FigmaRenderedElement implements RenderedElement {
                 this.node.parent
             );
         }
-
         return child;
     }
 
@@ -84,10 +90,8 @@ export class FigmaRenderedElement implements RenderedElement {
             console.warn("Attempting to applyColor on PageNode");
             return;
         }
-        let targetNode = this.node as any;
-        if (targetNode.children?.[0]) {
-            targetNode = targetNode.children[0];
-        }
+
+        const targetNode = this.getTargetNode();
         targetNode.fills = [
             {
                 type: "SOLID",
@@ -96,6 +100,12 @@ export class FigmaRenderedElement implements RenderedElement {
                     g: color.g / 255,
                     b: color.b / 255,
                 },
+            },
+            {
+                type: "SOLID",
+                blendMode: "LIGHTEN",
+                color: { r: 1, g: 1, b: 1 },
+                opacity: 0,
             },
         ];
     }
