@@ -6,10 +6,10 @@
     "types": "./lib/index.d.ts",
     "scripts": {
         "clean": "rimraf bundle lib",
-        "build": "npm run clean && tsc && webpack",
-        "test": "mocha -r ts-node/register 'tests/**/*.test.ts'",
+        "build": "npm run clean && tsc && npm run esbuild",
+        "esbuild": "esbuild --bundle --outfile=bundle/party.js src/index.ts --minify",
+        "test": "mocha -r ts-eager/register 'tests/**/*.test.ts'",
         "lint": "eslint . --ext .js,.ts",
-        "dev": "webpack serve",
         "prepare": "npm run build",
         "prepublishOnly": "yarn build"
     },
@@ -36,20 +36,14 @@
         "@typescript-eslint/eslint-plugin": "^4.14.2",
         "@typescript-eslint/parser": "^4.14.2",
         "chai": "^4.3.4",
+        "esbuild": "^0.14.38",
         "eslint": "^7.32.0",
         "eslint-config-prettier": "^8.2.0",
         "eslint-plugin-prettier": "^3.4.0",
         "mocha": "^9.1.2",
         "prettier": "^2.2.1",
         "rimraf": "^3.0.2",
-        "terser-webpack-plugin": "^5.1.1",
-        "ts-loader": "^8.0.14",
-        "ts-node": "^9.1.1",
-        "typescript": "^4.1.3",
-        "webpack": "^5.24.2",
-        "webpack-cli": "^4.8.0"
-    },
-    "optionalDependencies": {
-        "webpack-dev-server": "^4.3.0"
+        "ts-eager": "^2.0.2",
+        "typescript": "^4.1.3"
     }
 }
